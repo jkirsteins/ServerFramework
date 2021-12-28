@@ -133,7 +133,7 @@ public class SwiftNioLauncher : Launcher {
             self.logger.info("Shutting down")
         }
         catch {
-            self.logger.fatalAndDie("Failed to start server: \(error.localizedDescription)")
+            self.logger.fatalAndDie("Failed to start server: \(String(describing: error))")
         }
     }
 }

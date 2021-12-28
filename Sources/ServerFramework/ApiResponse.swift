@@ -72,7 +72,8 @@ public class ErrorResponse : ApiResponse<ErrorResponse.ErrorData>
         let message: String
         
         public init(_ error: Error) {
-            self.message = error.localizedDescription
+            // localizedDescription comes from Foundation
+            self.message = String(describing: error)
         }
     }
     
