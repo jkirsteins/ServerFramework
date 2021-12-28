@@ -16,12 +16,20 @@ public protocol ResponseHandler
 }
     
 public extension ResponseHandler {
+    func internalServerError() {
+        self.json(ApiResponseBody(data: "Internal Server Error", status: 500), status: 500)
+    }
+    
     func json<T: Encodable>(_ response: ApiResponse<T>) {
         self.json(response.body, status: response.status)
     }
     
     func empty() {
         self.json(NoContentResponse())
+    }
+    
+    func badRequest(_ message: String? = nil) {
+        self.json(BadRequestResponse(message))
     }
 }
 

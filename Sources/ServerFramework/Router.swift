@@ -51,6 +51,9 @@ open class Router {
                 
                 do {
                     try await middleware(request, response, scopedDependencies, isLast ? upperNext : next!)
+                } catch HttpRequestError.couldNotDeserializeRequest {
+                    response.json(ErrorResponse(HttpRequestError.couldNotDeserializeRequest, statusCode: 400))
+                    return
                 } catch {
                     response.json(ErrorResponse(error))
                     return
@@ -61,23 +64,54 @@ open class Router {
         }
     }
     
+    // TODO: unify method handlers
+    // TODO: add test for handling urldecoding in paths
+    
     /// Register a middleware which triggers on a `GET`
     /// with a specific path prefix.
     public func get(_ path: String = "",
              middleware: @escaping Middleware)
     {
+        // TODO: middlewares should be throwing
+        let pattern = try! PathPatternParser(path)
+        use { req, res, deps, next in
+                        
+            let decodedPath = req.url.path.percentDecoded()
+            
+            self.logger.debug("Comparing \(req.method) \(decodedPath) to GET \(path)")
+            let patternMatch = pattern.match(against: decodedPath)
+            
+            guard req.method == .get, let pathComponents = patternMatch.components
+            else {
+                return try await next()
+            }
+            
+            req.populatePathItems(pathComponents)
+            
+            try await middleware(req, res, deps, next)
+        }
+    }
+    
+    /// Register a middleware which triggers on a `DELETE`
+    /// with a specific path prefix.
+    public func delete(_ path: String = "",
+             middleware: @escaping Middleware)
+    {
+        // TODO: middlewares should be throwing
+        let pattern = try! PathPatternParser(path)
         use { req, res, deps, next in
             
-//            guard let reqUrl = URL(string: req.head.uri) else {
-//                print("Error: failed to parse request URI \(req.head.uri)")
-//                return try await next()
-//            }
+            let decodedPath = req.url.path.percentDecoded()
+                        
+            self.logger.debug("Comparing \(req.method) \(decodedPath) to DELETE \(path)")
+            let patternMatch = pattern.match(against: decodedPath)
             
-            self.logger.debug("Comparing \(req.method) \(req.url.path) to GET \(path)")
+            guard req.method == .delete, let pathComponents = patternMatch.components
+            else {
+                return try await next()
+            }
             
-            guard req.method == .get,
-                  req.url.path == path
-            else { return try await next() }
+            req.populatePathItems(pathComponents)
             
             try await middleware(req, res, deps, next)
         }
@@ -88,13 +122,21 @@ open class Router {
     public func post(_ path: String = "",
              middleware: @escaping Middleware)
     {
+        // TODO: middlewares should be throwing
+        let pattern = try! PathPatternParser(path)
         use { req, res, deps, next in
             
-            self.logger.debug("Comparing \(req.method) \(req.url.path) to POST \(path)")
+            let decodedPath = req.url.path.percentDecoded()
             
-            guard req.method == .post,
-                  req.url.path == path
-            else { return try await next() }
+            self.logger.debug("Comparing \(req.method) \(decodedPath) to POST \(path)")
+            let patternMatch = pattern.match(against: decodedPath)
+            
+            guard req.method == .post, let pathComponents = patternMatch.components
+            else {
+                return try await next()
+            }
+            
+            req.populatePathItems(pathComponents)
             
             try await middleware(req, res, deps, next)
         }
