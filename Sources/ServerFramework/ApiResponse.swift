@@ -31,13 +31,19 @@ public struct Nothing : Codable
 }
 
 public class NoContentResponse : ApiResponse<Nothing> {
-    init() {
+    public init() {
         super.init(body: nil, status: 204)
     }
 }
 
+public class BadRequestResponse : ApiResponse<String?> {
+    public init(_ message: String? = nil) {
+        super.init(body: ApiResponseBody(data: message, status: 400), status: 400)
+    }
+}
+
 public class OkResponse<T> : ApiResponse<T> where T: Encodable {
-    init(_ data: T?) {
+    public init(_ data: T?) {
         super.init(body: ApiResponseBody(data: data, status: 200), status: 200)
     }
 }
@@ -50,7 +56,7 @@ public class NotFoundResponse : ApiResponse<NotFoundResponse.ResponseData> {
         let message: String
     }
     
-    init(_ message: String? = nil) {
+    public init(_ message: String? = nil) {
         if let message = message {
             super.init(body: ApiResponseBody(data: ResponseData(message: message), status: Self.statusCode), status: Self.statusCode)
         } else {
@@ -65,7 +71,7 @@ public class ErrorResponse : ApiResponse<ErrorResponse.ErrorData>
     {
         let message: String
         
-        init(_ error: Error) {
+        public init(_ error: Error) {
             self.message = error.localizedDescription
         }
     }
