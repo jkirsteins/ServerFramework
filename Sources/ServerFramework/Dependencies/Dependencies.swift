@@ -127,6 +127,7 @@ public class Dependencies : DepResolver, DepRegistry, DependencyProvider
         entry.inObjectScope(.container)
     }
     
+    @discardableResult
     public func register<T>(factory: @escaping (ResolverOnly)->T) -> DependencyEntry<T> {
         let res = self.container.register(T.self) { r in
             factory(ResolverOnly(resolver: r))
