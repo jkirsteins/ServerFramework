@@ -56,7 +56,9 @@ let package = Package(
                 .product(name: "NIO", package: "swift-nio"),
 
                 // Extras
-                .product(name: "WebURL", package: "swift-url")
+                .product(name: "WebURL", package: "swift-url"),
+                // TODO: remove ExtrasJSON from other targets if it is in the base one
+                .product(name: "ExtrasJSON", package: "swift-extras-json"),
             ],
             path: "Sources/ServerFramework"
         ),
