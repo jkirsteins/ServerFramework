@@ -108,6 +108,14 @@ public class SwiftNioLauncher : Launcher {
         
         deps.register(instance: elg)
         
+        let bgTaskScheduler = BackgroundTaskScheduler()
+        deps.register(instance: bgTaskScheduler)
+        
+        lifecycle.register(label: "BackgroundTaskScheduler",
+                           start: .async(bgTaskScheduler.start),
+                           shutdown: .async(bgTaskScheduler.waitAndShutdown)
+        )
+        
         let app = factory(deps)
         
         let reuseAddrOpt = ChannelOptions.socket(SocketOptionLevel(SOL_SOCKET), SO_REUSEADDR)
