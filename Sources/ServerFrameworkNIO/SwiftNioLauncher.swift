@@ -91,23 +91,30 @@ public class SwiftNioLauncher : Launcher {
     
     public func run(dependencyProvider: DependencyProvider, factory: @escaping (Dependencies) -> Router) {
         
-        let deps = Dependencies(parent: dependencyProvider.dependencies)
-        
         let lifecycle: ServiceLifecycle
         
-        if let existingLifecycle: ServiceLifecycle = deps.resolveRequired() {
+        if let existingLifecycle: ServiceLifecycle = dependencyProvider.dependencies.resolveRequired() {
             self.logger.info("Using pre-existing ServiceLifecycle")
             lifecycle = existingLifecycle
         } else {
             self.logger.info("Creating and registering a new ServiceLifecycle")
             lifecycle = ServiceLifecycle()
-            deps.register(instance: lifecycle)
+            dependencyProvider.dependencies.register(instance: lifecycle)
         }
         
         let elg = createManagedEventLoopOrGroup(lifecycle: lifecycle)
         
-        deps.register(instance: elg)
+        dependencyProvider.dependencies.register(instance: elg)
         
+        let bgTaskScheduler = BackgroundTaskScheduler()
+        dependencyProvider.dependencies.register(instance: bgTaskScheduler)
+        
+        lifecycle.register(label: "BackgroundTaskScheduler",
+                           start: .async(bgTaskScheduler.start),
+                           shutdown: .async(bgTaskScheduler.waitAndShutdown)
+        )
+        
+        let deps = Dependencies(parent: dependencyProvider.dependencies)
         let app = factory(deps)
         
         let reuseAddrOpt = ChannelOptions.socket(SocketOptionLevel(SOL_SOCKET), SO_REUSEADDR)
