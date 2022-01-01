@@ -38,6 +38,7 @@ let package = Package(
               url: "https://github.com/karwa/swift-url",
               .upToNextMajor(from: "0.2.0")
             ),
+        .package(url: "https://github.com/apple/swift-distributed-tracing.git", from: "0.1.0"),
     ],
     targets: [
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
@@ -51,6 +52,7 @@ let package = Package(
                 .product(name: "Logging", package: "swift-log"),
                 .product(name: "Lifecycle", package: "swift-service-lifecycle"),
                 .product(name: "Metrics", package: "swift-metrics"),
+                
                 
                 // NIO for ByteBuffer
                 .product(name: "NIO", package: "swift-nio"),
@@ -73,6 +75,8 @@ let package = Package(
                 
                 // swift-server
                 .product(name: "Logging", package: "swift-log"),
+                .product(name: "Metrics", package: "swift-metrics"),
+                .product(name: "Tracing", package: "swift-distributed-tracing"),
                 
                 // Extras
                 .product(name: "ExtrasJSON", package: "swift-extras-json"),

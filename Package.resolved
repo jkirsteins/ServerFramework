@@ -29,6 +29,24 @@
         }
       },
       {
+        "package": "swift-distributed-tracing",
+        "repositoryURL": "https://github.com/apple/swift-distributed-tracing.git",
+        "state": {
+          "branch": null,
+          "revision": "7a89c904d80fd2dc7c6071806f38d5d0b2d5a1b5",
+          "version": "0.2.0"
+        }
+      },
+      {
+        "package": "swift-distributed-tracing-baggage",
+        "repositoryURL": "https://github.com/apple/swift-distributed-tracing-baggage.git",
+        "state": {
+          "branch": null,
+          "revision": "4239b6569f8a19b6bdc2b9c51973e2d67216014c",
+          "version": "0.2.1"
+        }
+      },
+      {
         "package": "swift-extras-json",
         "repositoryURL": "https://github.com/swift-extras/swift-extras-json.git",
         "state": {
