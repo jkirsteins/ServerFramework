@@ -28,7 +28,7 @@ public extension ResponseHandler {
         self.json(NoContentResponse())
     }
     
-    func badRequest(_ message: String? = nil) {
+    func badRequest(_ message: String) {
         self.json(BadRequestResponse(message))
     }
 }

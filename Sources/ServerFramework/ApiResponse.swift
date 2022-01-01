@@ -36,8 +36,14 @@ public class NoContentResponse : ApiResponse<Nothing> {
     }
 }
 
+public class AcceptedResponse : ApiResponse<Nothing> {
+    public init() {
+        super.init(body: nil, status: 202)
+    }
+}
+
 public class BadRequestResponse : ApiResponse<String?> {
-    public init(_ message: String? = nil) {
+    public init(_ message: String = "Invalid request") {
         super.init(body: ApiResponseBody(data: message, status: 400), status: 400)
     }
 }
