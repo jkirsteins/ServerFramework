@@ -93,7 +93,7 @@ public class SwiftNioLauncher : Launcher {
         
         let lifecycle: ServiceLifecycle
         
-        if let existingLifecycle: ServiceLifecycle = dependencyProvider.dependencies.resolveRequired() {
+        if let existingLifecycle: ServiceLifecycle = dependencyProvider.dependencies.resolve() {
             self.logger.info("Using pre-existing ServiceLifecycle")
             lifecycle = existingLifecycle
         } else {
@@ -103,19 +103,17 @@ public class SwiftNioLauncher : Launcher {
         }
         
         let elg = createManagedEventLoopOrGroup(lifecycle: lifecycle)
-        
         dependencyProvider.dependencies.register(instance: elg)
         
-        let bgTaskScheduler = BackgroundTaskScheduler()
+        let bgTaskScheduler = BackgroundTaskScheduler(eventLoopGroup: elg)
         dependencyProvider.dependencies.register(instance: bgTaskScheduler)
         
-        lifecycle.register(label: "BackgroundTaskScheduler",
-                           start: .async(bgTaskScheduler.start),
+        lifecycle.register(label: String(describing: BackgroundTaskScheduler.self),
+                           start: .none, // .async(bgTaskScheduler.start),
                            shutdown: .async(bgTaskScheduler.waitAndShutdown)
         )
         
-        let deps = Dependencies(parent: dependencyProvider.dependencies)
-        let app = factory(deps)
+        let app = factory(dependencyProvider.dependencies)
         
         let reuseAddrOpt = ChannelOptions.socket(SocketOptionLevel(SOL_SOCKET), SO_REUSEADDR)
         let bootstrap = ServerBootstrap(group: elg)
@@ -123,7 +121,7 @@ public class SwiftNioLauncher : Launcher {
             .serverChannelOption(reuseAddrOpt, value: 1)
             .childChannelInitializer { channel in
                 channel.pipeline.configureHTTPServerPipeline().flatMap {
-                    channel.pipeline.addHandler(HTTPHandler(router: app, dependencies: deps))
+                    channel.pipeline.addHandler(HTTPHandler(router: app, dependencies: dependencyProvider.dependencies))
                 }
             }
             .childChannelOption(ChannelOptions.socket(IPPROTO_TCP, TCP_NODELAY), value: 1)
