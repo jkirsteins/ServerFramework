@@ -20,6 +20,10 @@ public extension ResponseHandler {
         self.json(ApiResponseBody(data: "Internal Server Error", status: 500), status: 500)
     }
     
+    func notAuthorized() {
+        self.json(ApiResponseBody(data: "Not authorized", status: 403), status: 403)
+    }
+    
     func json<T: Encodable>(_ response: ApiResponse<T>) {
         self.json(response.body, status: response.status)
     }
