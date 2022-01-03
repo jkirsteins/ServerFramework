@@ -8,7 +8,7 @@
 public struct HttpHeaderKeyValuePair : Encodable {
     public init(name: String, value: String) {
         self.name = name
-        self.value = value
+        self.value = value.trimmingCharacters(in: .whitespacesAndNewlines)
     }
     
     public let name: String

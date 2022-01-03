@@ -10,10 +10,10 @@ public typealias HttpHeaders = [HttpHeaderKeyValuePair]
 public extension HttpHeaders {
     subscript(_ name: String) -> String? {
         get {
-            self.first(where: { $0.name == name })?.value
+            return self.first(where: { $0.name.range(of: name, options: .caseInsensitive) != nil })?.value
         }
         set(newValue) {
-            self.removeAll(where: { $0.name == name })
+            self.removeAll(where: { $0.name.range(of: name, options: .caseInsensitive) != nil })
             
             if let newValue = newValue {
                 self.append(HttpHeaderKeyValuePair(name: name, value: newValue))

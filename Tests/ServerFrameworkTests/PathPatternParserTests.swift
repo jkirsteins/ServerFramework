@@ -1,7 +1,7 @@
 import XCTest
 @testable import ServerFramework
 
-final class ServerFrameworkTests: XCTestCase {
+final class PathPatternParserTests: XCTestCase {
     func testInit_simpleExactMatch() throws {
         let sut = try PathPatternParser("/hello")
         
