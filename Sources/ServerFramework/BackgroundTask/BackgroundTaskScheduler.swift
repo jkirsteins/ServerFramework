@@ -32,7 +32,6 @@ public class BackgroundTaskScheduler
     public typealias TaskType = (@Sendable () async -> Void)
     
     let elg: EventLoopGroup
-    //    let interval: TimeAmount = .seconds(5)
     
     let taskQueueLock = Lock()
     var queue = CircularBuffer<EventLoopFuture<Void>>()
@@ -40,6 +39,8 @@ public class BackgroundTaskScheduler
     public init(eventLoopGroup: EventLoopGroup) {
         self.elg = eventLoopGroup
     }
+    
+    public var pending: Int { self.queue.count }
     
     public func addTask(task: @escaping TaskType) throws {
         guard !shouldTerminate else {
