@@ -223,11 +223,12 @@ struct LambdaHandler: LambdaHandlerRestAPI {
         
         let rawQueryString = (event.queryStringParameters ?? [:]).map { "\($0)=\($1)" }.joined(separator: "&")
         
-        let host = event.headers["Host"] ?? "lambda-unknown"
-        let portPart = event.headers["X-Forwarded-Port"] != nil ? ":\(String(describing: event.headers["X-Forwarded-Port"]))" : ""
-        let scheme = event.headers["X-Forwarded-Proto"] ?? "https"
-        guard let url = URL("\(scheme)://\(host)\(portPart)\(event.path)?\(rawQueryString)") else {
-            let message = "Could not construct an invocation URL from \(event.path) and \(rawQueryString)"
+        let host: String = event.headers["Host"] ?? "lambda-unknown"
+        let portPart: String = event.headers["X-Forwarded-Port"] != nil ? ":\(event.headers["X-Forwarded-Port"]!)" : ""
+        let scheme: String = event.headers["X-Forwarded-Proto"] ?? "https"
+        let candidate = "\(scheme)://\(host)\(portPart)\(event.path)?\(rawQueryString)"
+        guard let url = URL(candidate) else {
+            let message = "Could not construct an invocation URL from \(candidate)"
             self.logger.error(Logger.Message(stringLiteral: message))
             return context.eventLoop.makeFailedFuture(LambdaHandlerError.invalidEvent(message))
         }
