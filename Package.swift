@@ -25,6 +25,12 @@ let package = Package(
                 "ServerFramework",
                 "ServerFrameworkLambda",
             ]),
+        .library(
+            name: "ServerFrameworkAuth",
+            targets: [
+                "ServerFramework",
+                "ServerFrameworkAuth"
+            ]),
     ],
     dependencies: [
         .package(url: "https://github.com/swift-server/swift-aws-lambda-runtime.git", .upToNextMajor(from:"0.5.0")),
@@ -39,6 +45,8 @@ let package = Package(
               .upToNextMajor(from: "0.2.0")
             ),
         .package(url: "https://github.com/apple/swift-distributed-tracing.git", from: "0.1.0"),
+        .package(url: "https://github.com/swift-server/async-http-client.git", from: "1.0.0"),
+        .package(url: "https://github.com/Kitura/Swift-JWT.git", from: "3.6.0"),
     ],
     targets: [
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
@@ -112,6 +120,26 @@ let package = Package(
                 .product(name: "NIO", package: "swift-nio"),
             ],
             path: "Sources/ServerFrameworkXCTest"
+        ),
+        .target(
+            name: "ServerFrameworkAuth",
+            dependencies: [
+                .byName(name: "ServerFramework"),
+                
+                // Extras
+                .product(name: "ExtrasJSON", package: "swift-extras-json"),
+                
+                // NIO
+                .product(name: "NIO", package: "swift-nio"),
+
+                 
+                .product(name: "SwiftJWT", package: "Swift-JWT"),
+
+                
+                // HTTP client
+                .product(name: "AsyncHTTPClient", package: "async-http-client"),
+            ],
+            path: "Sources/ServerFrameworkAuth"
         ),
         .testTarget(
             name: "ServerFrameworkTests",

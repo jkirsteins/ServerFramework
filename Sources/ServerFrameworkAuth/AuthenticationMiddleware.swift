@@ -5,6 +5,7 @@
 //  Created by Janis Kirsteins on 18/12/2021.
 //
 
+import ServerFramework
 import Logging
 
 fileprivate let logger = Logger(label: "AuthenticationMiddleware")
